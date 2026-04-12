@@ -101,3 +101,9 @@ canvas {
     height: auto;
     image-rendering: pixelated;
 }
+.swatch {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
