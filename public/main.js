@@ -111,12 +111,12 @@ for (var i = 0; i < swatches.length; i++) {
     };
 }
 
-var ZOOM_LEVELS = [2,4,8,16,32];
+var ZOOM_LEVELS = [4,8,16,32];
 var zoomIdx = 1;
 
 canvas.addEventListener("wheel", function(e) {
     e.preventDefault();
-    if (e.deltaY < 0 && zoomIdx < 5) {
+    if (e.deltaY < 0 && zoomIdx < ZOOM_LEVELS.length - 1) {
     zoomIdx++;
     } else if (e.deltaY > 0 && zoomIdx > 0) {
     zoomIdx --;
@@ -124,5 +124,9 @@ canvas.addEventListener("wheel", function(e) {
 PIXEL_SIZE = ZOOM_LEVELS[zoomIdx];
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
+
+canvas.style.width = canvas.width + "px";
+canvas.style.height = canvas.height + "px";
+
 drawAll();
 }, {passive: false });
