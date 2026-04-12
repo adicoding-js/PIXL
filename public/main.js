@@ -10,6 +10,8 @@ var selectedColor = "#000000";
 var isDrawing = false;
 var currentTool = "pencil";
 var swatches;
+var eraserImg = new Image();
+eraserImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21'/%3E%3Cpath d='M22 21H7'/%3E%3Cpath d='m5 11 9 9'/%3E%3C/svg%3E";
 
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
@@ -51,11 +53,15 @@ var pixelX = Math.floor(mouseX / PIXEL_SIZE);
 var pixelY = Math.floor(mouseY / PIXEL_SIZE);
 
 if (pixelX >= 0 && pixelX < GRID_W && pixelY >= 0 && pixelY < GRID_H) {
-statusCoords.textContent = "X: " + pixelX + " Y: " + pixelY;
-
-drawAll();
-ctx.fillStyle = "rgba(0,0,0,0.2)";
-ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);}
+    statusCoords.textContent = "X: " + pixelX + " Y: " + pixelY;
+    drawAll();  
+    if (currentTool === "eraser") {
+        ctx.drawImage(eraserImg, mouseX - 12, mouseY - 12, 24, 24);
+    } else {
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+    }
+}
 
 if(isDrawing) {
     placePx(pixelX, pixelY);
@@ -74,7 +80,7 @@ function placePx(pixelX, pixelY) {
     var idx = pixelY * GRID_W + pixelX;
     var drawColor = (currentTool === "eraser") ? "#ffffff" : selectedColor;
     pixelColor[idx] = drawColor;
-    ctx.fillStyle = selectedColor;
+    ctx.fillStyle = drawColor;
     ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
 }
 
