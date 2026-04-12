@@ -8,6 +8,8 @@ var statusCoords = document.querySelector(".status-coords");
 var CGA_PALETTE = ["#000000","#0000AA","#00AA00","#00AAAA","#AA0000","#AA00AA","#AA5500","#AAAAAA","#555555","#5555FF","#55FF55","#55FFFF","#FF5555","#FF55FF","#FFFF55","#FFFFFF"]
 var selectedColor = "#000000";
 var isDrawing = false;
+var currentTool = "pencil";
+var swatches;
 
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
@@ -60,9 +62,18 @@ if(isDrawing) {
 }
 });
 
+function updateCursor() {
+    if(currentTool == "pencil") {
+        canvas.style.cursor = "crosshair";
+    } else if (currentTool == "eraser") {
+    canvas.style.cursor = "cell";
+    }
+}
+
 function placePx(pixelX, pixelY) {
     var idx = pixelY * GRID_W + pixelX;
-    pixelColor[idx] = selectedColor;
+    var drawColor = (currentTool === "eraser") ? "#ffffff" : selectedColor;
+    pixelColor[idx] = drawColor;
     ctx.fillStyle = selectedColor;
     ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
 }
@@ -88,6 +99,42 @@ document.addEventListener("mouseup", function() {
 });
 
 var toolbar = document.getElementById("toolbar");
+
+var pencilBtn = document.createElement("button");
+pencilBtn.className = "toolbtn inset";
+pencilBtn.textContent = "p";
+pencilBtn.title = "Pencil";
+toolbar.appendChild(pencilBtn);
+
+var eraserBtn = document.createElement("button");
+eraserBtn.className = "toolbtn outset";
+eraserBtn.textContent = "e";
+eraserBtn.title = "Eraser";
+toolbar.appendChild(eraserBtn);
+
+var sep = document.createElement("div");
+sep.className = "inset";
+sep.style.width = "2px";
+sep.style.height = "28px";
+sep.style.margin = "0 4px";
+toolbar.appendChild(sep);
+
+pencilBtn.onclick =function() {
+    currentTool = "pencil";
+    var toolBtns = document.querySelectorAll(".toolbtn");
+    for (var t = 0; t < toolBtns.length; t++) { toolBtns[t].className = "toolbtn outset"; }
+    pencilBtn.className = "toolbtn inset";
+    document.querySelector(".status-tool").textContent = "Tool: Pencil";
+    updateCursor();
+};
+eraserBtn.onclick = function() {
+    currentTool = "eraser";
+    var toolBtns = document.querySelectorAll(".toolbtn");
+    for (var t = 0; t < toolBtns.length; t++) { toolBtns[t].className = "toolbtn outset"; }
+    eraserBtn.className = "toolbtn inset";
+    document.querySelector(".status-tool").textContent = "Tool: Eraser";
+    updateCursor();
+};
  
 for (var i = 0; i < CGA_PALETTE.length; i++) {
     var sw = document.createElement("div");
@@ -97,7 +144,7 @@ for (var i = 0; i < CGA_PALETTE.length; i++) {
     toolbar.appendChild(sw);
 }
  
-var swatches = document.querySelectorAll(".swatch");
+swatches = document.querySelectorAll(".swatch");
 swatches[0].className = "swatch outset";
  
 for (var i = 0; i < swatches.length; i++) {
@@ -108,8 +155,15 @@ for (var i = 0; i < swatches.length; i++) {
             swatches[j].className = "swatch inset";
         }
         this.className = "swatch outset";
+        var colordot = document.querySelector(".status-colordot");
+        if (colordot) colordot.style.background = selectedColor;
     };
 }
+
+setInterval(function() {
+    var d = new Date();
+    document.querySelector(".status-clock").textContent = d.toLocaleDateString([], {hour: "2-digit", minute: "2-digit"});
+}, 1000);
 
 var ZOOM_LEVELS = [4,8,16,32];
 var zoomIdx = 1;
@@ -130,3 +184,4 @@ canvas.style.height = canvas.height + "px";
 
 drawAll();
 }, {passive: false });
+drawAll();
