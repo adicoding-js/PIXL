@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PIXL</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="window" class="outset">
+            <div id="titlebar">
+                <span class="winIcon">'icon here'</span>
+                <span class="winTitle">PIXL</span>
+                <div class="win-buttons">
+                    <button class="btn-min">-</button>
+                    <button class="btnmax">🗖</button>
+                    <button class="btn-close">X</button>
+                </div>
+            </div> <div id="menubar">
+                <span>File</span><span>Edit</span><span>View</span><span>Help</span>
+            </div>
+
+            <div id="toolbar"></div>
+
+            <div id="content" class="inset">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+
+            <div id="statusbar">
+                <span class="status-tool">Tool: Pencil</span>
+                <span class="status-coords">X: 0 Y: 0</span>
+                <span class="status-clock">00:00</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

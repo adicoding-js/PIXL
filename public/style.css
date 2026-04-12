@@ -1,0 +1,103 @@
+body {
+margin: 0;
+background-color: #008080;
+overflow: hidden;
+font-family: 'MS Sans Serif', Arial, sans-serif;
+height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+#window {
+background: #C0C0C0;
+width: 820px;
+max-width: 95vw;
+max-height: 95vh;
+display: flex;
+flex-direction: column;
+padding: 2px;
+}
+
+#titlebar {
+background: linear-gradient(90deg, #000080, #1084D0);
+color: white;
+display: flex;
+align-items: center;
+height: 22px;
+padding: 2px 4px;
+font-weight: bold;
+}
+
+.win-buttons {
+margin-left: auto;
+display: flex;
+gap: 2px;
+}
+
+.win-buttons button {
+width: 16px;
+height: 14px;
+font-size: 10px;
+background: #C0C0C0;
+border: 1px solid white;
+border-right-color: #808080;
+border-bottom-color: #808080;
+padding: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+#menubar {
+display: flex;
+padding: 2px 0;
+font-size: 12px;
+}
+
+#menubar span {
+padding: 2px 6px;
+}
+
+#toolbar {
+height: 40px;
+border-bottom: 2px inset white;
+display: flex;
+align-items: center;
+padding: 4px;
+}
+
+#content {
+background: #808080;
+padding: 10px;
+overflow: auto;
+height: 600px;
+}
+
+#statusbar {
+display: flex;
+gap: 16px;
+font-size: 11px;
+padding: 2px 6px;
+border-top: 2px inset white;
+}
+
+.inset {
+border: 2px solid;
+border-color: #808080 #FFFFFF #FFFFFF #808080;
+}
+
+.outset {
+border: 2px solid;
+border-color: #FFFFFF #808080 #808080 #FFFFFF;
+}
+
+canvas {
+background: white;
+display: block;
+} 
+canvas {
+    max-width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+}
