@@ -5,7 +5,7 @@ var canvas = document.getElementById("mainCanvas");
 var ctx = canvas.getContext("2d");
 var pixelColor = [];
 var statusCoords = document.querySelector(".status-coords");
-var CGA_PALETTE = ["#000000","#0000AA","#00AA00","#00AAAA","#AA0000","#AA00AA","#AA5500","#AAAAAA","#555555","#5555FF","#55FF55","#55FFFF","#FF5555","#FF55FF","#FFFF55","#FFFFFF"]
+var CGA_PALETTE = ["#000000","#0000AA","#00AA00","#00AAAA","#AA0000","#AA00AA","#AA5500","#AAAAAA","#555555","#5555FF","#55FF55","#55FFFF","#FF5555","#FF55FF","#FFFF55","#ffffff"]
 var selectedColor = "#000000";
 var isDrawing = false;
 var currentTool = "pencil";
@@ -63,7 +63,7 @@ if (pixelX >= 0 && pixelX < GRID_W && pixelY >= 0 && pixelY < GRID_H) {
     }
 }
 
-if(isDrawing) {
+if(isDrawing && currentTool != "eyedropper") {
     placePx(pixelX, pixelY);
 }
 });
@@ -73,11 +73,32 @@ function updateCursor() {
         canvas.style.cursor = "crosshair";
     } else if (currentTool == "eraser") {
     canvas.style.cursor = "cell";
+    } else if (currentTool == "eyedropper") {
+        canvas.style.cursor = "default";
     }
 }
 
 function placePx(pixelX, pixelY) {
     var idx = pixelY * GRID_W + pixelX;
+    if (currentTool == "eyedropper") {
+        selectedColor = pixelColor[idx];
+        for (var j = 0; j < swatches.length;j++) {
+            swatches[j].className = "swatch inset";
+            if (CGA_PALETTE[j] == selectedColor) {
+                swatches[j].className = "swatch outset";
+            }
+        }
+        var colordot = document.querySelector(".status-colordot");
+        if (colordot) colordot.style.background = selectedColor;
+        currentTool = "pencil";
+        var toolBtns = document.querySelectorAll(".toolbtn");
+        for (var t = 0; t < toolBtns.length; t++) { toolBtns[t].className = "toolbtn outset";}
+        pencilBtn.className = "toolbtn inset";
+        document.querySelector(".status-tool").textContent = "Tool: Pencil";
+        updateCursor();
+        return;
+    }
+
     var drawColor = (currentTool === "eraser") ? "#ffffff" : selectedColor;
     pixelColor[idx] = drawColor;
     ctx.fillStyle = drawColor;
@@ -118,6 +139,12 @@ eraserBtn.textContent = "e";
 eraserBtn.title = "Eraser";
 toolbar.appendChild(eraserBtn);
 
+var eyedropperBtn = document.createElement("button");
+eyedropperBtn.className = "toolbtn outset";
+eyedropperBtn.textContent = "d";
+eyedropperBtn.title = "EyeDropper";
+toolbar.appendChild(eyedropperBtn);
+
 var sep = document.createElement("div");
 sep.className = "inset";
 sep.style.width = "2px";
@@ -139,6 +166,15 @@ eraserBtn.onclick = function() {
     for (var t = 0; t < toolBtns.length; t++) { toolBtns[t].className = "toolbtn outset"; }
     eraserBtn.className = "toolbtn inset";
     document.querySelector(".status-tool").textContent = "Tool: Eraser";
+    updateCursor();
+};
+
+eyedropperBtn.onclick = function() {
+    currentTool = "eyedropper";
+    var toolBtns = document.querySelectorAll(".toolbtn");
+    for (var t = 0; t < toolBtns.length; t++) {toolBtns[t].className = "toolbtn outset";}
+    eyedropperBtn.className = "toolbtn inset";
+    document.querySelector(".status-tool").textContent = "Tool: Eyedropper";
     updateCursor();
 };
  
