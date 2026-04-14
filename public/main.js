@@ -290,6 +290,12 @@ socket.on("pixelPlace", function(data) {
     ctx.fillStyle = data.color;
     ctx.fillRect(data.x * PIXEL_SIZE, data.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); 
 });
+socket.on("userCount", function(count) {
+    var userSpan = document.querySelector(".status-users");
+    if (userSpan) {
+        userSpan.textContent = "Players Online: " + count.toString().padStart(2, "0");
+    }
+});
 
 socket.on("disconnect", function() {
     var conn = document.querySelector(".status-conn");

@@ -16,19 +16,12 @@ var maps = {
     "retro": { state: Array(40000).fill("#FF55FF"), authors: Array(40000).fill(""), theme: "theme-retro"}
 };
 
-// var canvasState = [];
-// var pixelAuthors = [];
-// for (var i =0; i < 40000; i++) {
-//     canvasState.push("#ffffff");
-//     pixelAuthors.push("");
-// }
-
 io.on("connection", function(socket) {
     console.log("connected: " + socket.id);
     socket.currentMap = "main";
     socket.join("main");
     socket.emit("init", {canvasState: maps["main"].state, theme: maps["main"].theme, mapName: "main" });
-    
+    io.emit("userCount", io.engine.clientsCount);
     socket.on("joinMap", function(mapName) {
         if (!maps[mapName]) mapName = "main";
         socket.leave(socket.currentMap);
@@ -49,6 +42,7 @@ io.on("connection", function(socket) {
     });
      socket.on("disconnect", function() {
         console.log("disconnected: " + socket.id);
+        io.emit("userCount", io.engine.clientsCount);
     });
 });
 
