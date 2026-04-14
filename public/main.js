@@ -100,9 +100,20 @@ function placePx(pixelX, pixelY) {
     }
 
     var drawColor = (currentTool === "eraser") ? "#ffffff" : selectedColor;
-    pixelColor[idx] = drawColor;
-    ctx.fillStyle = drawColor;
-    ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+
+    if (pixelColor[idx] !== drawColor) {
+        pixelColor[idx] = drawColor;
+        ctx.fillStyle = drawColor;
+        ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
+
+        if(typeof socket !== "undefined") {
+            socket.emit("pixelPlace", {
+                x: pixelX,
+                y: pixelY,
+                color: drawColor
+            });
+        }
+    }
 }
 
 canvas.addEventListener("mousedown", function(e) {
@@ -229,3 +240,24 @@ drawAll();
 drawAll();
 var colordotEl = document.querySelector(".status-colordot");
 if (colordotEl) colordotEl.style.background = selectedColor;
+
+var socket = io();
+
+socket.on("init", function(data) {
+    for (var i = 0; i < 40000; i++) {
+        pixelColor[i] = data.canvasState[i];
+    }
+    drawAll();
+    var conn = document.querySelector(".status-conn");
+    if (conn) conn.style.background = "#00AA00";
+});
+socket.on("pixelPlace", function(data) {
+    var idx = data.y * GRID_W + data.x;
+    pixelColor[idx] = data.color;
+    ctx.fillRect(data.x * PIXEL_SIZE, data.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); //new
+});
+
+socket.on("disconnect", function() {
+    var conn = document.querySelector(".status-conn");
+    if (conn) conn.style.background = "#AA0000";
+});
