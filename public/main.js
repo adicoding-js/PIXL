@@ -227,3 +227,5 @@ canvas.style.height = canvas.height + "px";
 drawAll();
 }, {passive: false });
 drawAll();
+var colordotEl = document.querySelector(".status-colordot");
+if (colordotEl) colordotEl.style.background = selectedColor;
