@@ -243,10 +243,23 @@ if (colordotEl) colordotEl.style.background = selectedColor;
 
 var socket = io();
 
+var mapSelect = document.getElementById("mapSelect");
+if (mapSelect) {
+    mapSelect.addEventListener("change", function() {
+        socket.emit("joinMap", this.value);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    });
+}
+
 socket.on("init", function(data) {
     for (var i = 0; i < 40000; i++) {
         pixelColor[i] = data.canvasState[i];
     }
+    document.body.className = data.theme || "theme-classic";
+    if (mapSelect && data.mapName) {
+    mapSelect.value = data.mapName;
+}
     drawAll();
     var conn = document.querySelector(".status-conn");
     if (conn) conn.style.background = "#00AA00";
@@ -254,6 +267,7 @@ socket.on("init", function(data) {
 socket.on("pixelPlace", function(data) {
     var idx = data.y * GRID_W + data.x;
     pixelColor[idx] = data.color;
+    ctx.fillStyle = data.color;
     ctx.fillRect(data.x * PIXEL_SIZE, data.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); //new
 });
 

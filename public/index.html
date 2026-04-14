@@ -4,8 +4,7 @@
     <title>PIXL</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div id="app">
+<body class="theme-classic"> <div id="app">
         <div id="window" class="outset">
             <div id="titlebar">
                 <span class="winIcon">'icon here'</span>
@@ -19,7 +18,13 @@
                 <span>File</span><span>Edit</span><span>View</span><span>Help</span>
             </div>
 
-            <div id="toolbar"></div>
+            <div id="toolbar">
+                <select id="mapSelect" class="inset" style="margin-left: 4px; margin-right: auto; padding: 2px;">
+                    <option value="main">Main Canvas</option>
+                    <option value="dark">Dark Canvas</option>
+                    <option value="vaporwave">Retro Canvas</option>
+                </select>
+            </div>
 
             <div id="content" class="inset">
                 <canvas id="mainCanvas"></canvas>

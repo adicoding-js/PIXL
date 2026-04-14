@@ -2,6 +2,7 @@ var express = require("express");
 const { realpathSync } = require("fs");
 var http = require("http");
 var socketio = require("socket.io");
+const { threadName } = require("worker_threads");
 
 var app = express();
 var server = http.createServer(app);
@@ -9,26 +10,42 @@ var io = socketio(server);
 
 app.use(express.static("public"));
 
-var canvasState = [];
-var pixelAuthors = [];
-for (var i =0; i < 40000; i++) {
-    canvasState.push("#ffffff");
-    pixelAuthors.push("");
-}
+var maps = {
+    "main": { state: Array(40000).fill("#ffffff"), authors: Array(40000).fill(""), theme: "theme-classic"},
+    "dark": {state: Array(40000).fill("#555555"), authors: Array(40000).fill(""), theme: "theme-dark"},
+    "retro": { state: Array(40000).fill("#FF55FF"), authors: Array(40000).fill(""), theme: "theme-retro"}
+};
+
+// var canvasState = [];
+// var pixelAuthors = [];
+// for (var i =0; i < 40000; i++) {
+//     canvasState.push("#ffffff");
+//     pixelAuthors.push("");
+// }
 
 io.on("connection", function(socket) {
     console.log("connected: " + socket.id);
-    socket.emit("init", {canvasState: canvasState, pixelAuthors: pixelAuthors});
+    socket.currentMap = "main";
+    socket.join("main");
+    socket.emit("init", {canvasState: maps["main"].state, theme: maps["main"].theme, mapName: "main" });
     
+    socket.on("joinMap", function(mapName) {
+        if (!maps[mapName]) mapName = "main";
+        socket.leave(socket.currentMap);
+        socket.join(mapName);
+        socket.currentMap = mapName;
+        socket.emit("init", { canvasState: maps[mapName].state, theme: maps[mapName].theme, mapName: mapName });
+    });
+
     socket.on("pixelPlace", function(data) {
         if (data.x < 0 || data.x >= 200 || data.y < 0 || data.y >= 200) return;
         if (typeof data.color != "string") return;
         var VALID = ["#000000","#0000AA","#00AA00","#00AAAA","#AA0000","#AA00AA","#AA5500","#AAAAAA","#555555","#5555FF","#55FF55","#55FFFF","#FF5555","#FF55FF","#FFFF55","#ffffff"];
         if (VALID.indexOf(data.color) < 0) return;
         var idx = data.y * 200 + data.x;
-        canvasState[idx] = data.color;
-        pixelAuthors[idx] = data.username || "Hack-Clubber";
-        socket.broadcast.emit("pixelPlace", {x: data.x, y: data.y, color:data.color, username: data.username});
+        maps[socket.currentMap].state[idx] = data.color;
+        maps[socket.currentMap].authors[idx] = data.username || "Hack-Clubber";
+        io.to(socket.currentMap).emit("pixelPlace", {x: data.x, y: data.y, color:data.color, username: data.username});
     });
      socket.on("disconnect", function() {
         console.log("disconnected: " + socket.id);
