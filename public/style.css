@@ -72,6 +72,7 @@ background: #808080;
 padding: 10px;
 overflow: auto;
 height: 600px;
+position: relative;
 }
 
 #statusbar {
@@ -80,6 +81,19 @@ gap: 16px;
 font-size: 11px;
 padding: 2px 6px;
 border-top: 2px inset white;
+}
+
+#scanlines {
+position: absolute;
+top: 10px;
+left: 10px;
+pointer-events: none;
+z-index: 10;
+background:  repeating-linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.25) 50%);
+background-size: 100% 4px;
+width: 800px;
+height: 800px;
+box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
 }
 
 .inset {

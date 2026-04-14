@@ -12,6 +12,7 @@ var currentTool = "pencil";
 var swatches;
 var eraserImg = new Image();
 eraserImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21'/%3E%3Cpath d='M22 21H7'/%3E%3Cpath d='m5 11 9 9'/%3E%3C/svg%3E";
+var crtOn = true;
 
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
@@ -156,6 +157,12 @@ eyedropperBtn.textContent = "d";
 eyedropperBtn.title = "EyeDropper";
 toolbar.appendChild(eyedropperBtn);
 
+var crtBtn = document.createElement("button");
+crtBtn.className = "toolbtn outset";
+crtBtn.textContent = "CRT";
+crtBtn.style.fontSize = "10px";
+toolbar.appendChild(crtBtn);
+
 var sep = document.createElement("div");
 sep.className = "inset";
 sep.style.width = "2px";
@@ -187,6 +194,13 @@ eyedropperBtn.onclick = function() {
     eyedropperBtn.className = "toolbtn inset";
     document.querySelector(".status-tool").textContent = "Tool: Eyedropper";
     updateCursor();
+};
+
+crtBtn.onclick = function() {
+    crtOn = !crtOn;
+    var sl = document.getElementById("scanlines");
+    sl.style.display = crtOn ? "block" : "none";
+    crtBtn.className = crtOn ? "toolbtn outset" : "toolbtn inset";
 };
  
 for (var i = 0; i < CGA_PALETTE.length; i++) {
@@ -223,6 +237,7 @@ var zoomIdx = 1;
 
 canvas.addEventListener("wheel", function(e) {
     e.preventDefault();
+    var sl = document.getElementById("scanlines");
     if (e.deltaY < 0 && zoomIdx < ZOOM_LEVELS.length - 1) {
     zoomIdx++;
     } else if (e.deltaY > 0 && zoomIdx > 0) {
@@ -234,6 +249,11 @@ canvas.height = GRID_H * PIXEL_SIZE;
 
 canvas.style.width = canvas.width + "px";
 canvas.style.height = canvas.height + "px";
+
+sl.style.width = canvas.width + "px";
+sl.style.height = canvas.height + "px";
+
+sl.style.background = "100%" + PIXEL_SIZE + "px";
 
 drawAll();
 }, {passive: false });
@@ -268,7 +288,7 @@ socket.on("pixelPlace", function(data) {
     var idx = data.y * GRID_W + data.x;
     pixelColor[idx] = data.color;
     ctx.fillStyle = data.color;
-    ctx.fillRect(data.x * PIXEL_SIZE, data.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); //new
+    ctx.fillRect(data.x * PIXEL_SIZE, data.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); 
 });
 
 socket.on("disconnect", function() {
