@@ -3,6 +3,9 @@ const { realpathSync } = require("fs");
 var http = require("http");
 var socketio = require("socket.io");
 const { threadName } = require("worker_threads");
+const fs = require("fs");
+const path = require("path");
+const { json } = require("body-parser");
 
 var app = express();
 var server = http.createServer(app);
@@ -15,6 +18,27 @@ var maps = {
     "dark": {state: Array(40000).fill("#555555"), authors: Array(40000).fill(""), theme: "theme-dark"},
     "retro": { state: Array(40000).fill("#FF55FF"), authors: Array(40000).fill(""), theme: "theme-retro"}
 };
+
+const canvas_file = path.join(__dirname, "canvas.json");
+
+if (fs.existsSync(canvas_file)) {
+    try{
+        const data = JSON.parse(fs.readFileSync(canvas_file, "utf8"));
+        for (let map in data) if (maps[map]) maps[map] = data[map];
+    } catch (e) {}
+}
+
+function saveCanvas(sync = false) {
+    try {
+        if (sync) fs.writeFileSync(canvas_file, JSON.stringify(maps), "utf-8");
+        else fs.writeFile(canvas_file, JSON.stringify(maps), "utf8", () => {});
+    } catch (e) {}
+}
+setInterval(() => saveCanvas(false), 30000);
+process.on("SIGINT", () => {
+    saveCanvas(true);
+    process.exit(0);
+});
 
 io.on("connection", function(socket) {
     console.log("connected: " + socket.id);
