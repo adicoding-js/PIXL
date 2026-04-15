@@ -372,3 +372,52 @@ document.addEventListener("mousemove", function(e) {
 document.addEventListener("mouseup", function() {
     isDraggingMinimap = false;
 });
+
+var isPanning = false;
+var startX, startY, startScrollLeft, startScrollTop;
+
+contentDiv.addEventListener("mousedown", function(e) {
+    if (e.button === 1) {
+        e.preventDefault();
+        isPanning = true;
+        
+        startX = e.pageX;
+        startY = e.pageY;
+        startScrollLeft = contentDiv.scrollLeft;
+        startScrollTop = contentDiv.scrollTop;
+        
+        contentDiv.style.cursor = "grabbing";
+    }
+});
+
+document.addEventListener("mousemove", function(e) {
+    if (!isPanning) return;
+    e.preventDefault();
+    
+    var walkX = e.pageX - startX;
+    var walkY = e.pageY - startY;
+    
+    contentDiv.scrollLeft = startScrollLeft - walkX;
+    contentDiv.scrollTop = startScrollTop - walkY;
+});
+
+document.addEventListener("mouseup", function(e) {
+    if (e.button === 1 && isPanning) {
+        isPanning = false;
+        contentDiv.style.cursor = "auto"; 
+        updateCursor(); 
+    }
+});
+
+var PAN_SPEED = 40;
+
+document.addEventListener("keydown", function(e) {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.key) > -1) {
+        e.preventDefault();
+        
+        if (e.key === "ArrowUp") contentDiv.scrollTop -= PAN_SPEED;
+        if (e.key === "ArrowDown") contentDiv.scrollTop += PAN_SPEED;
+        if (e.key === "ArrowLeft") contentDiv.scrollLeft -= PAN_SPEED;
+        if (e.key === "ArrowRight") contentDiv.scrollLeft += PAN_SPEED;
+    }
+});
