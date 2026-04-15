@@ -41,6 +41,7 @@ ctx.strokeStyle = "#DDDDDD";
         ctx.lineTo(canvas.width, y * PIXEL_SIZE);
     }
     ctx.stroke();
+    updateMinimap();
 }
 
 canvas.addEventListener("mousemove", function(e) {
@@ -106,7 +107,7 @@ function placePx(pixelX, pixelY) {
         pixelColor[idx] = drawColor;
         ctx.fillStyle = drawColor;
         ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
-
+        updateMinimap();
         if(typeof socket !== "undefined") {
             socket.emit("pixelPlace", {
                 x: pixelX,
@@ -253,7 +254,7 @@ canvas.style.height = canvas.height + "px";
 sl.style.width = canvas.width + "px";
 sl.style.height = canvas.height + "px";
 
-sl.style.background = "100%" + PIXEL_SIZE + "px";
+sl.style.backgroundSize = "100%" + PIXEL_SIZE + "px";
 
 drawAll();
 }, {passive: false });
@@ -289,6 +290,7 @@ socket.on("pixelPlace", function(data) {
     pixelColor[idx] = data.color;
     ctx.fillStyle = data.color;
     ctx.fillRect(data.x * PIXEL_SIZE, data.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); 
+    updateMinimap();
 });
 socket.on("userCount", function(count) {
     var userSpan = document.querySelector(".status-users");
@@ -300,4 +302,73 @@ socket.on("userCount", function(count) {
 socket.on("disconnect", function() {
     var conn = document.querySelector(".status-conn");
     if (conn) conn.style.background = "#AA0000";
+});
+
+var minimapCanvas = document.getElementById("minimapCanvas");
+var minimapCtx = minimapCanvas.getContext("2d");
+var contentDiv = document.getElementById("content");
+
+function updateMinimap() {
+    if (!minimapCtx) return;
+    
+    minimapCtx.imageSmoothingEnabled = false;
+    minimapCtx.clearRect(0, 0, 100, 100);
+    minimapCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 100, 100);
+
+    var visibleW = contentDiv.clientWidth;
+    var visibleH = contentDiv.clientHeight;
+
+    var scaleX = 100 / canvas.width;
+    var scaleY = 100 / canvas.height;
+
+    var rectX = contentDiv.scrollLeft * scaleX;
+    var rectY = contentDiv.scrollTop * scaleY;
+    var rectW = visibleW * scaleX;
+    var rectH = visibleH * scaleY;
+
+    if (rectW > 100) rectW = 100;
+    if (rectH > 100) rectH = 100;
+
+    minimapCtx.strokeStyle = "red";
+    minimapCtx.lineWidth = 1;
+    minimapCtx.strokeRect(rectX, rectY, rectW, rectH);
+    
+    minimapCtx.fillStyle = "rgba(0, 0, 0, 0.4)";
+    minimapCtx.fillRect(0, 0, 100, rectY);
+    minimapCtx.fillRect(0, rectY + rectH, 100, 100 - (rectY + rectH));
+    minimapCtx.fillRect(0, rectY, rectX, rectH);
+    minimapCtx.fillRect(rectX + rectW, rectY, 100 - (rectX + rectW), rectH);
+}
+
+contentDiv.addEventListener("scroll", updateMinimap);
+
+var isDraggingMinimap = false;
+
+function panFromMinimap(e) {
+    var rect = minimapCanvas.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+
+    var targetX = (x / 100) * canvas.width;
+    var targetY = (y / 100) * canvas.height;
+
+    contentDiv.scrollLeft = targetX - (contentDiv.clientWidth / 2);
+    contentDiv.scrollTop = targetY - (contentDiv.clientHeight / 2);
+    
+    updateMinimap();
+}
+
+minimapCanvas.addEventListener("mousedown", function(e) {
+    isDraggingMinimap = true;
+    panFromMinimap(e);
+});
+
+document.addEventListener("mousemove", function(e) {
+    if (isDraggingMinimap) {
+        panFromMinimap(e);
+    }
+});
+
+document.addEventListener("mouseup", function() {
+    isDraggingMinimap = false;
 });
