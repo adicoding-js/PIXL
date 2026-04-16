@@ -18,8 +18,45 @@
                 <canvas id="minimapCanvas" width="100" height="100" class="inset"></canvas>
             </div>
                 </div>
-            </div> <div id="menubar">
-                <span>File</span><span>Edit</span><span>View</span><span>Help</span>
+            </div> 
+            
+            <div id="menubar">
+                <div class="menu-item" id="menuFile">File
+                    <div class="dropdown outset">
+                        <div class="dropdown-item" id="btnScreenshot">Save Canvas...</div>
+                        <div class="menu-separator"></div>
+                        <div class="dropdown-item" id="btnExit" onclick="alert('It is inescapable.')">Exit</div>
+                    </div>
+                </div>
+                <div class="menu-item" id="menuEdit">Edit
+                    <div class="dropdown outset">
+                        <div class="dropdown-item" style="color: gray;">Undo (WIP)</div>
+                    </div>
+                </div>
+                <div class="menu-item" id="menuView">View
+                    <div class="dropdown outset">
+                        <div class="dropdown-item" id="btnToggleGrid">Show Grid <span id="gridCheck">✓</span></div>
+                    </div>
+                </div>
+                <div class="menu-item" id="menuHelp">Help
+                    <div class="dropdown outset">
+                        <div class="dropdown-item" id="btnAbout">About PIXL...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="aboutDialog" class="outset" style="display: none; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: #C0C0C0; width: 250px; z-index: 2000; padding: 2px;">
+                <div id="titlebar">
+                    <span class="winTitle">About</span>
+                    <div class="win-buttons">
+                        <button id="closeAbout">X</button>
+                    </div>
+                </div>
+                <div style="padding: 20px; text-align: center; color: black; display: flex; flex-direction: column; gap: 10px;">
+                    <h2 style="margin: 0;">PIXL</h2>
+                    <p style="margin: 0; font-size: 12px;">Version 1.0 (Win98 Edition)<br>A retro collaborative canvas.</p>
+                    <button class="outset" id="okAbout" style="width: 80px; margin: 10px auto 0; padding: 4px; cursor: pointer;">OK</button>
+                </div>
             </div>
 
             <div id="toolbar">

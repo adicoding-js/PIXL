@@ -13,6 +13,7 @@ var swatches;
 var eraserImg = new Image();
 eraserImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21'/%3E%3Cpath d='M22 21H7'/%3E%3Cpath d='m5 11 9 9'/%3E%3C/svg%3E";
 var crtOn = true;
+var showGrid = true;
 
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
@@ -28,7 +29,7 @@ for (var i = 0; i < GRID_H; i++) {
             ctx.fillRect(j * PIXEL_SIZE, i * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
         }
     }
-
+if (showGrid) {
 ctx.strokeStyle = "#DDDDDD";
     ctx.lineWidth = 0.5;
     ctx.beginPath();
@@ -41,6 +42,7 @@ ctx.strokeStyle = "#DDDDDD";
         ctx.lineTo(canvas.width, y * PIXEL_SIZE);
     }
     ctx.stroke();
+}
     updateMinimap();
 }
 
@@ -421,3 +423,75 @@ document.addEventListener("keydown", function(e) {
         if (e.key === "ArrowRight") contentDiv.scrollLeft += PAN_SPEED;
     }
 });
+
+var menuItems = document.querySelectorAll('.menu-item');
+var dropdowns = document.querySelectorAll('.dropdown');
+
+menuItems.forEach(function(item){
+  item.addEventListener('mousedown', function(e){
+   e.stopPropagation();
+
+   var drop = this.querySelector('.dropdown');
+   var isVisible = drop && drop.style.display === 'flex';
+
+   dropdowns.forEach(function(d){
+    d.style.display = 'none';
+   });
+
+   if(!isVisible && drop){
+    drop.style.display = 'flex';
+   }
+  });
+});
+
+document.addEventListener('mousedown', function(){
+  dropdowns.forEach(function(d){
+   d.style.display = 'none';
+  });
+});
+
+document.getElementById('btnScreenshot').addEventListener('mousedown', function(e){
+  e.stopPropagation();
+
+  dropdowns.forEach(function(d){
+   d.style.display = 'none';
+  });
+
+  var link = document.createElement('a');
+  link.download = 'pixl_masterpiece.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+document.getElementById('btnToggleGrid').addEventListener('mousedown', function(e){
+  e.stopPropagation();
+
+  dropdowns.forEach(function(d){
+   d.style.display = 'none';
+  });
+
+  showGrid = !showGrid;
+  document.getElementById('gridCheck').textContent = showGrid ? "✓" : "";
+
+  drawAll();
+});
+
+var aboutDialog = document.getElementById('aboutDialog');
+
+document.getElementById('btnAbout').addEventListener('mousedown', function(e){
+  e.stopPropagation();
+
+  dropdowns.forEach(function(d){
+   d.style.display = 'none';
+  });
+
+  aboutDialog.style.display = 'block';
+});
+
+document.getElementById('closeAbout').onclick = function(){
+  aboutDialog.style.display = 'none';
+};
+
+document.getElementById('okAbout').onclick = function(){
+  aboutDialog.style.display = 'none';
+};

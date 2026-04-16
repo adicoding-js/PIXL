@@ -114,6 +114,18 @@ display: block;
 cursor: crosshair;
 }
 
+#menubar {
+display: flex;
+padding: 2px 0;
+font-size: 12px;
+position: relative;
+z-index: 500;
+}
+
+#gridCheck {
+font-weight: bold;
+}
+
 .inset {
 border: 2px solid;
 border-color: #808080 #FFFFFF #FFFFFF #808080;
@@ -176,4 +188,37 @@ canvas {
 }
 .theme-retro .minimap-titlebar {
     background: linear-gradient(90deg, #ff71ce, #b967ff);
+}
+.menu-item {
+position: relative;
+padding: 2px 6px;
+cursor: default;
+user-select: none;
+color: black;
+}
+.menu-item:hover {
+background: #000000;
+color: white;
+}
+.dropdown {
+display: none;
+position: absolute;
+top: 100%;
+left: 0;
+background: #C0C0C0;
+color: black;
+min-height: 140px;
+flex-direction: column;
+padding: 2px;
+box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+.dropdown-item:hover {
+background: #000000;
+color: white;
+}
+.menu-separator {
+height: 0;
+margin: 3px 2px;
+border-top:1px solid #808080;
+border-bottom: 1px solid #FFFFFF;
 }
