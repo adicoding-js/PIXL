@@ -114,7 +114,8 @@ function placePx(pixelX, pixelY) {
             socket.emit("pixelPlace", {
                 x: pixelX,
                 y: pixelY,
-                color: drawColor
+                color: drawColor,
+                username: globalUsername
             });
         }
     }
@@ -495,3 +496,28 @@ document.getElementById('closeAbout').onclick = function(){
 document.getElementById('okAbout').onclick = function(){
   aboutDialog.style.display = 'none';
 };
+
+var globalUsername = "Player";
+var usernameDialog = document.getElementById("usernameDialog");
+var usernameInput = document.getElementById("usernameInput");
+var mainAppTitle = document.querySelector(".winTitle");
+
+function submitUsername() {
+    var val = usernameInput.value.trim();
+    if (val !=="") {
+        globalUsername = val;
+    }
+    usernameDialog.style.display = "none";
+    mainAppTitle.textContent = "PIXL - " + globalUsername;
+
+    if (typeof socket !== "undefined") {
+        socket.emit("setUsername", globalUsername);
+    }
+}
+document.getElementById("okUsername").addEventListener("click", submitUsername);
+document.getElementById("closeUsername").addEventListener("click", function() {
+    usernameDialog.style.display = "none";
+});
+usernameInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") submitUsername();
+});

@@ -46,19 +46,30 @@
             </div>
 
             <div id="aboutDialog" class="outset" style="display: none; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: #C0C0C0; width: 250px; z-index: 2000; padding: 2px;">
-                <div id="titlebar">
-                    <span class="winTitle">About</span>
-                    <div class="win-buttons">
-                        <button id="closeAbout">X</button>
-                    </div>
-                </div>
-                <div style="padding: 20px; text-align: center; color: black; display: flex; flex-direction: column; gap: 10px;">
-                    <h2 style="margin: 0;">PIXL</h2>
-                    <p style="margin: 0; font-size: 12px;">Version 1.0 (Win98 Edition)<br>A retro collaborative canvas.</p>
-                    <button class="outset" id="okAbout" style="width: 80px; margin: 10px auto 0; padding: 4px; cursor: pointer;">OK</button>
-                </div>
-            </div>
-
+    <div id="titlebar">
+        <span class="winTitle">About</span>
+        <div class="win-buttons">
+            <button id="closeAbout">X</button>
+        </div>
+    </div>
+    <div style="padding: 20px; text-align: center; color: black; display: flex; flex-direction: column; gap: 10px;">
+        <h2 style="margin: 0;">PIXL</h2>
+        <p style="margin: 0; font-size: 12px;">Version 1.0 (Win98 Edition)<br>A retro collaborative canvas.</p>
+        <button class="outset" id="okAbout" style="width: 80px; margin: 10px auto 0; padding: 4px; cursor: pointer;">OK</button>
+    </div>
+</div> <div id="usernameDialog" class="outset" style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: #C0C0C0; width: 280px; z-index: 3000; padding: 2px;">
+    <div class="modal-titlebar" style="background: linear-gradient(90deg, #000080, #1084D0); color: white; display: flex; align-items: center; height: 22px; padding: 2px 4px; font-weight: bold;">
+        <span class="winTitle" style="font-size: 12px;">Enter Username</span>
+        <div class="win-buttons" style="margin-left: auto;">
+            <button id="closeUsername" style="width: 16px; height: 14px; font-size: 10px; background: #C0C0C0; border: 1px solid white; border-right-color: #808080; border-bottom-color: #808080; display: flex; align-items: center; justify-content: center;">X</button>
+        </div>
+    </div>
+    <div style="padding: 20px; text-align: center; color: black; display: flex; flex-direction: column; gap: 10px;">
+        <p style="margin: 0; font-size: 12px;">Identify yourself on the canvas:</p>
+        <input type="text" id="usernameInput" class="inset" style="padding: 4px; width: 80%; margin: 0 auto; outline: none; font-family: 'MS Sans Serif', Arial, sans-serif;" value="Player">
+        <button class="outset" id="okUsername" style="width: 80px; margin: 10px auto 0; padding: 4px; cursor: pointer;">OK</button>
+    </div>
+</div>
             <div id="toolbar">
                 <select id="mapSelect" class="inset" style="margin-left: 4px; margin-right: auto; padding: 2px;">
                     <option value="main">Main Canvas</option>

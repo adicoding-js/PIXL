@@ -43,9 +43,13 @@ process.on("SIGINT", () => {
 io.on("connection", function(socket) {
     console.log("connected: " + socket.id);
     socket.currentMap = "main";
+    socket.username = "HackClubber";
     socket.join("main");
     socket.emit("init", {canvasState: maps["main"].state, theme: maps["main"].theme, mapName: "main" });
     io.emit("userCount", io.engine.clientsCount);
+    socket.on("setUsername", function(username) {
+    socket.username = username || "HackClubber";
+    });
     socket.on("joinMap", function(mapName) {
         if (!maps[mapName]) mapName = "main";
         socket.leave(socket.currentMap);
@@ -60,8 +64,9 @@ io.on("connection", function(socket) {
         var VALID = ["#000000","#0000AA","#00AA00","#00AAAA","#AA0000","#AA00AA","#AA5500","#AAAAAA","#555555","#5555FF","#55FF55","#55FFFF","#FF5555","#FF55FF","#FFFF55","#ffffff"];
         if (VALID.indexOf(data.color) < 0) return;
         var idx = data.y * 200 + data.x;
+        var authorName = data.username || socket.username;
         maps[socket.currentMap].state[idx] = data.color;
-        maps[socket.currentMap].authors[idx] = data.username || "Hack-Clubber";
+        maps[socket.currentMap].authors[idx] = authorName;
         io.to(socket.currentMap).emit("pixelPlace", {x: data.x, y: data.y, color:data.color, username: data.username});
     });
      socket.on("disconnect", function() {
