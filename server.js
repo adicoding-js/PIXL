@@ -45,7 +45,7 @@ io.on("connection", function(socket) {
     socket.currentMap = "main";
     socket.username = "HackClubber";
     socket.join("main");
-    socket.emit("init", {canvasState: maps["main"].state, theme: maps["main"].theme, mapName: "main" });
+    socket.emit("init", {canvasState: maps["main"].state, authors: maps["main"].authors, theme: maps["main"].theme, mapName: "main" });
     io.emit("userCount", io.engine.clientsCount);
     socket.on("setUsername", function(username) {
     socket.username = username || "HackClubber";

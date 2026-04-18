@@ -14,12 +14,17 @@ var eraserImg = new Image();
 eraserImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21'/%3E%3Cpath d='M22 21H7'/%3E%3Cpath d='m5 11 9 9'/%3E%3C/svg%3E";
 var crtOn = true;
 var showGrid = true;
+var pixelAuthors = [];
+var tooltip = document.createElement("div");
+tooltip.id = "pixelTooltip";
+document.body.appendChild(tooltip);
 
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
 
 for (var i = 0; i< 40000; i++) {
 pixelColor.push("#ffffff");
+pixelAuthors.push("");
 }
 
 function drawAll() {
@@ -65,11 +70,28 @@ if (pixelX >= 0 && pixelX < GRID_W && pixelY >= 0 && pixelY < GRID_H) {
         ctx.fillStyle = "rgba(0,0,0,0.2)";
         ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
     }
+
+    var hoverIdx = pixelY * GRID_W + pixelX;
+    var author = pixelAuthors[hoverIdx];
+    if (author && author !== "") {
+        tooltip.style.display = "block";
+        tooltip.textContent = "Placed by " + author;
+        tooltip.style.left = (e.clientX + 15) + "px";
+        tooltip.style.top = (e.clientY + 15) + "px";
+}   else {
+        tooltip.style.display = "none";
+}
+}   else {
+    tooltip.style.display = "none";
 }
 
 if(isDrawing && currentTool != "eyedropper") {
     placePx(pixelX, pixelY);
 }
+});
+
+canvas.addEventListener("mouseout", function() {
+    tooltip.style.display = "none";
 });
 
 function updateCursor() {
@@ -107,6 +129,7 @@ function placePx(pixelX, pixelY) {
 
     if (pixelColor[idx] !== drawColor) {
         pixelColor[idx] = drawColor;
+        pixelAuthors[idx] = globalUsername;
         ctx.fillStyle = drawColor;
         ctx.fillRect(pixelX * PIXEL_SIZE, pixelY * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
         updateMinimap();
@@ -279,6 +302,7 @@ if (mapSelect) {
 socket.on("init", function(data) {
     for (var i = 0; i < 40000; i++) {
         pixelColor[i] = data.canvasState[i];
+        pixelAuthors[i] = data.authors[i] || "";
     }
     document.body.className = data.theme || "theme-classic";
     if (mapSelect && data.mapName) {
@@ -291,6 +315,7 @@ socket.on("init", function(data) {
 socket.on("pixelPlace", function(data) {
     var idx = data.y * GRID_W + data.x;
     pixelColor[idx] = data.color;
+    pixelAuthors[idx] = data.username || "";
     ctx.fillStyle = data.color;
     ctx.fillRect(data.x * PIXEL_SIZE, data.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); 
     updateMinimap();
