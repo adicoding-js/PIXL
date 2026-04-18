@@ -18,6 +18,8 @@ var pixelAuthors = [];
 var tooltip = document.createElement("div");
 tooltip.id = "pixelTooltip";
 document.body.appendChild(tooltip);
+var localHistory = [];
+var MAX_HISTORY = 50;
 
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
@@ -128,6 +130,15 @@ function placePx(pixelX, pixelY) {
     var drawColor = (currentTool === "eraser") ? "#ffffff" : selectedColor;
 
     if (pixelColor[idx] !== drawColor) {
+        localHistory.push({
+            x: pixelX,
+            y: pixelY,
+            prevColor: pixelColor[idx],
+            prevAuthor: pixelAuthors[idx]
+        });
+    if (localHistory.length > MAX_HISTORY) {
+        localHistory.shift();
+    }
         pixelColor[idx] = drawColor;
         pixelAuthors[idx] = globalUsername;
         ctx.fillStyle = drawColor;
@@ -545,4 +556,49 @@ document.getElementById("closeUsername").addEventListener("click", function() {
 });
 usernameInput.addEventListener("keydown", function(e) {
     if (e.key === "Enter") submitUsername();
+});
+
+function performUndo() {
+    if (localHistory.length === 0) return;
+
+    var lastAction = localHistory.pop();
+    var idx = lastAction.y * GRID_W + lastAction.x;
+
+    pixelColor[idx] = lastAction.prevColor;
+    pixelAuthors[idx] = lastAction.prevAuthor;
+
+    ctx.fillStyle = lastAction.prevColor;
+    ctx.fillRect(
+        lastAction.x * PIXEL_SIZE,
+        lastAction.y * PIXEL_SIZE,
+        PIXEL_SIZE,
+        PIXEL_SIZE
+    );
+    updateMinimap();
+    if (typeof socket !== "undefined") {
+        socket.emit("pixelPlace", {
+            x: lastAction.x,
+            y: lastAction.y,
+            color: lastAction.prevColor,
+            username: lastAction.prevAuthor
+        });
+    }
+}
+var btnUndo = document.getElementById('btnUndo');
+
+if (btnUndo) {
+    btnUndo.addEventListener('mousedown', function(e) {
+        e.stopPropagation();
+
+        dropdowns.forEach(function(d) {
+            d.style.display = 'none';
+        });
+
+        performUndo();
+    });
+}
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        performUndo();
+    }
 });
