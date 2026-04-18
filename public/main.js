@@ -302,7 +302,7 @@ if (mapSelect) {
 socket.on("init", function(data) {
     for (var i = 0; i < 40000; i++) {
         pixelColor[i] = data.canvasState[i];
-        pixelAuthors[i] = data.authors[i] || "";
+        pixelAuthors[i] = data.authors ? data.authors[i] : "";
     }
     document.body.className = data.theme || "theme-classic";
     if (mapSelect && data.mapName) {

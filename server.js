@@ -56,7 +56,14 @@ io.on("connection", function(socket) {
         socket.join(mapName);
         socket.currentMap = mapName;
         socket.emit("init", { canvasState: maps[mapName].state, theme: maps[mapName].theme, mapName: mapName });
+
+    socket.emit("init", {
+        canvasState: maps[mapName].state,
+        authors: maps[mapName].authors,
+        theme: maps[mapName].theme,
+        mapName: mapName
     });
+});
 
     socket.on("pixelPlace", function(data) {
         if (data.x < 0 || data.x >= 200 || data.y < 0 || data.y >= 200) return;
