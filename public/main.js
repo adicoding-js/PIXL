@@ -390,26 +390,44 @@ var zoomIdx = 1;
 
 canvas.addEventListener("wheel", function(e) {
     e.preventDefault();
-    var sl = document.getElementById("scanlines");
+    var oldZoomIdx = zoomIdx;  
     if (e.deltaY < 0 && zoomIdx < ZOOM_LEVELS.length - 1) {
-    zoomIdx++;
+        zoomIdx++;
     } else if (e.deltaY > 0 && zoomIdx > 0) {
-    zoomIdx --;
+        zoomIdx--;
     }
-PIXEL_SIZE = ZOOM_LEVELS[zoomIdx];
-canvas.width = GRID_W * PIXEL_SIZE;
-canvas.height = GRID_H * PIXEL_SIZE;
+    if (oldZoomIdx === zoomIdx) return;
 
-canvas.style.width = canvas.width + "px";
-canvas.style.height = canvas.height + "px";
+    var oldPixelSize = ZOOM_LEVELS[oldZoomIdx];
+    var newPixelSize = ZOOM_LEVELS[zoomIdx];
+    var ratio = newPixelSize / oldPixelSize;
+    var contentRect = contentDiv.getBoundingClientRect();
+    var mouseXRelativeToContainer = e.clientX - contentRect.left;
+    var mouseYRelativeToContainer = e.clientY - contentRect.top;
+    var absoluteCanvasX = contentDiv.scrollLeft + mouseXRelativeToContainer;
+    var absoluteCanvasY = contentDiv.scrollTop + mouseYRelativeToContainer;
+    var newAbsoluteCanvasX = absoluteCanvasX * ratio;
+    var newAbsoluteCanvasY = absoluteCanvasY * ratio;
 
-sl.style.width = canvas.width + "px";
-sl.style.height = canvas.height + "px";
+    PIXEL_SIZE = newPixelSize;
+    canvas.width = GRID_W * PIXEL_SIZE;
+    canvas.height = GRID_H * PIXEL_SIZE;
 
-sl.style.backgroundSize = "100%" + PIXEL_SIZE + "px";
+    canvas.style.width = canvas.width + "px";
+    canvas.style.height = canvas.height + "px";
 
-drawAll();
-}, {passive: false });
+    var sl = document.getElementById("scanlines");
+    sl.style.width = canvas.width + "px";
+    sl.style.height = canvas.height + "px";
+    sl.style.backgroundSize = "100% " + PIXEL_SIZE + "px";
+
+    contentDiv.scrollLeft = newAbsoluteCanvasX - mouseXRelativeToContainer;
+    contentDiv.scrollTop = newAbsoluteCanvasY - mouseYRelativeToContainer;
+
+    drawAll();
+    updateMinimap();
+}, { passive: false });
+
 drawAll();
 var colordotEl = document.querySelector(".status-colordot");
 if (colordotEl) colordotEl.style.background = selectedColor;
