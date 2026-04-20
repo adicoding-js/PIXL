@@ -20,6 +20,8 @@ tooltip.id = "pixelTooltip";
 document.body.appendChild(tooltip);
 var localHistory = [];
 var MAX_HISTORY = 50;
+var shapeStartX = 0;
+var shapeStartY = 0;
 
 canvas.width = GRID_W * PIXEL_SIZE;
 canvas.height = GRID_H * PIXEL_SIZE;
@@ -27,6 +29,38 @@ canvas.height = GRID_H * PIXEL_SIZE;
 for (var i = 0; i< 40000; i++) {
 pixelColor.push("#ffffff");
 pixelAuthors.push("");
+}
+
+function getShapePixels(tool, x0, y0, x1, y1) {
+    var pixels = [];
+    if (tool === "line") {
+        var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        var dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        var err = (dx > dy ? dx : -dy) / 2;
+        while (true) {
+            pixels.push({x: x0, y: y0});
+            if (x0 === x1 && y0 === y1) break;
+            var e2 = err;
+            if (e2 > -dx) { err -= dy; x0 += sx; }
+            if (e2 < dy) { err += dx; y0 += sy; }
+        }
+    } else if (tool === "rect") {
+        var minX = Math.min(x0, x1), maxX = Math.max(x0, x1);
+        var minY = Math.min(y0, y1), maxY = Math.max(y0, y1);
+        for(var x = minX; x <= maxX; x++) { pixels.push({x: x, y: minY}); pixels.push({x: x, y: maxY}); }
+        for(var y = minY + 1; y < maxY; y++) { pixels.push({x: minX, y: y}); pixels.push({x: maxX, y: y}); }
+    } else if (tool === "circle") {
+        var r = Math.round(Math.sqrt(Math.pow(x1-x0, 2) + Math.pow(y1-y0, 2)));
+        var x = r, y = 0, err = 0;
+        while (x >= y) {
+            pixels.push({x: x0 + x, y: y0 + y}, {x: x0 + y, y: y0 + x}, {x: x0 - y, y: y0 + x}, {x: x0 - x, y: y0 + y},
+                        {x: x0 - x, y: y0 - y}, {x: x0 - y, y: y0 - x}, {x: x0 + y, y: y0 - x}, {x: x0 + x, y: y0 - y});
+            y += 1;
+            err += 1 + 2*y;
+            if (2*(err-x) + 1 > 0) { x -= 1; err += 1 - 2*x; }
+        }
+    }
+    return pixels;
 }
 
 function drawAll() {
@@ -87,8 +121,19 @@ if (pixelX >= 0 && pixelX < GRID_W && pixelY >= 0 && pixelY < GRID_H) {
     tooltip.style.display = "none";
 }
 
-if(isDrawing && currentTool != "eyedropper") {
-    placePx(pixelX, pixelY);
+if(isDrawing) {
+    if (["pencil", "eraser"].includes(currentTool)) {
+        placePx(pixelX, pixelY);
+    } else if (["line", "rect", "circle"].includes(currentTool)) {
+        var pixels = getShapePixels(currentTool, shapeStartX, shapeStartY, pixelX, pixelY);
+        ctx.fillStyle = selectedColor;
+        for (var i = 0; i < pixels.length; i++) {
+            var p = pixels[i];
+            if (p.x >= 0 && p.x < GRID_W && p.y >= 0 && p.y < GRID_H) {
+                ctx.fillRect(p.x * PIXEL_SIZE, p.y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+            }
+        }
+    }
 }
 });
 
@@ -166,12 +211,37 @@ canvas.addEventListener("mousedown", function(e) {
         var pixelX = Math.floor(mouseX / PIXEL_SIZE);
         var pixelY = Math.floor(mouseY / PIXEL_SIZE);
         if (pixelX >= 0 && pixelX < GRID_W && pixelY >= 0 && pixelY < GRID_H) {
-            placePx(pixelX, pixelY);
+            if (["line", "rect", "circle"].includes(currentTool)) {
+                shapeStartX = pixelX;
+                shapeStartY = pixelY;
+            } else {
+                placePx(pixelX, pixelY);
+            }
         }
     }
 });
  
-document.addEventListener("mouseup", function() {
+document.addEventListener("mouseup", function(e) {
+    if (isDrawing && ["line", "rect", "circle"].includes(currentTool)) {
+        var rect = canvas.getBoundingClientRect();
+        var scaleX = canvas.width / rect.width;
+        var scaleY = canvas.height / rect.height;
+        var mouseX = (e.clientX - rect.left) * scaleX;
+        var mouseY = (e.clientY - rect.top) * scaleY;
+        var pixelX = Math.floor(mouseX / PIXEL_SIZE);
+        var pixelY = Math.floor(mouseY / PIXEL_SIZE);
+
+        pixelX = Math.max(0, Math.min(GRID_W - 1, pixelX));
+        pixelY = Math.max(0, Math.min(GRID_H - 1, pixelY));
+
+        var pixels = getShapePixels(currentTool, shapeStartX, shapeStartY, pixelX, pixelY);
+        for (var i = 0; i < pixels.length; i++) {
+            var p = pixels[i];
+            if (p.x >= 0 && p.x < GRID_W && p.y >= 0 && p.y < GRID_H) {
+                placePx(p.x, p.y);
+            }
+        }
+    }
     isDrawing = false;
 });
 
@@ -200,6 +270,24 @@ crtBtn.className = "toolbtn outset";
 crtBtn.textContent = "CRT";
 crtBtn.style.fontSize = "10px";
 toolbar.appendChild(crtBtn);
+
+var lineBtn = document.createElement("button");
+lineBtn.className = "toolbtn outset";
+lineBtn.textContent = "/";
+lineBtn.title = "Line";
+toolbar.appendChild(lineBtn);
+
+var rectBtn = document.createElement("button");
+rectBtn.className = "toolbtn outset";
+rectBtn.textContent = "☐";
+rectBtn.title = "Rectangle";
+toolbar.appendChild(rectBtn);
+
+var circleBtn = document.createElement("button");
+circleBtn.className = "toolbtn outset";
+circleBtn.textContent = "◯";
+circleBtn.title = "Circle";
+toolbar.appendChild(circleBtn);
 
 var sep = document.createElement("div");
 sep.className = "inset";
@@ -231,6 +319,33 @@ eyedropperBtn.onclick = function() {
     for (var t = 0; t < toolBtns.length; t++) {toolBtns[t].className = "toolbtn outset";}
     eyedropperBtn.className = "toolbtn inset";
     document.querySelector(".status-tool").textContent = "Tool: Eyedropper";
+    updateCursor();
+};
+
+lineBtn.onclick = function() {
+    currentTool = "line";
+    var toolBtns = document.querySelectorAll(".toolbtn");
+    for (var t = 0; t < toolBtns.length; t++) { if (toolBtns[t].textContent !== "CRT") toolBtns[t].className = "toolbtn outset"; }
+    lineBtn.className = "toolbtn inset";
+    document.querySelector(".status-tool").textContent = "Tool: Line";
+    updateCursor();
+};
+
+rectBtn.onclick = function() {
+    currentTool = "rect";
+    var toolBtns = document.querySelectorAll(".toolbtn");
+    for (var t = 0; t < toolBtns.length; t++) { if (toolBtns[t].textContent !== "CRT") toolBtns[t].className = "toolbtn outset"; }
+    rectBtn.className = "toolbtn inset";
+    document.querySelector(".status-tool").textContent = "Tool: Rectangle";
+    updateCursor();
+};
+
+circleBtn.onclick = function() {
+    currentTool = "circle";
+    var toolBtns = document.querySelectorAll(".toolbtn");
+    for (var t = 0; t < toolBtns.length; t++) { if (toolBtns[t].textContent !== "CRT") toolBtns[t].className = "toolbtn outset"; }
+    circleBtn.className = "toolbtn inset";
+    document.querySelector(".status-tool").textContent = "Tool: Circle";
     updateCursor();
 };
 
