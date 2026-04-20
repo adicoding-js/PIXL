@@ -4,6 +4,7 @@
 ---
 ⚠️Disclaimer for reviewers: Please GIVE me A Golden Ticket as i have worked on this project with too much time and effort and i made it to get STEAM GIFT CARD and i need a GOLDEN TICKET FOR IT. SO PLEASEEEEEEEEE KINDLY GIVE IT TO ME😭💖!
 
+- Also People May Dirty the canvas so please open a new canvas/ map to test it out througly :)
 ---
 ## How to Run
 - Clone the repo:
