@@ -307,6 +307,12 @@ if (mapSelect) {
         socket.emit("joinMap", this.value);
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        var chatMessages = document.getElementById("chatMessages");
+        if (chatMessages) {
+            chatMessages.innerHTML = `<div style="color: #888; font-style: italic;">Joined channel: ${this.options[this.selectedIndex].text}</div>`;
+            document.getElementById("chatRoomName").textContent = this.options[this.selectedIndex].text.replace(" Canvas", "");
+        }
     });
 }
 
@@ -601,4 +607,69 @@ document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
         performUndo();
     }
+});
+
+var chatWindow = document.getElementById("chatWindow");
+var chatMessages = document.getElementById("chatMessages");
+var chatInput = document.getElementById("chatInput");
+var chatSend = document.getElementById("chatSend");
+var chatTitlebar = document.getElementById("chatTitlebar");
+
+socket.on("chatMessage", function(data) {
+    var msgDiv = document.createElement("div");
+    msgDiv.style.marginBottom = "4px";
+    var timeString = new Date(data.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    msgDiv.innerHTML = `<span style="color: #888;">[${timeString}]</span> <b>${data.username}:</b> <span class="msg-text"></span>`;
+    msgDiv.querySelector('.msg-text').textContent = data.text;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
+function sendChat() {
+    var text = chatInput.value.trim();
+    if (text !== "") {
+        socket.emit("chatMessage", text);
+        chatInput.value = "";
+    }
+}
+
+chatSend.addEventListener("click", sendChat);
+chatInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        sendChat();
+    }
+});
+
+var isDraggingChat = false;
+var chatDragOffsetX, chatDragOffsetY;
+
+chatTitlebar.addEventListener("mousedown", function(e) {
+    if (e.target.tagName.toLowerCase() === "button") return;
+    isDraggingChat = true;
+    var rect = chatWindow.getBoundingClientRect();
+    chatDragOffsetX = e.clientX - rect.left;
+    chatDragOffsetY = e.clientY - rect.top;
+});
+
+document.addEventListener("mousemove", function(e) {
+    if (isDraggingChat) {
+    var parentRect = chatWindow.parentElement.getBoundingClientRect();
+    chatWindow.style.bottom = "auto";
+    var newLeft = e.clientX - parentRect.left - chatDragOffsetX;
+    var newRight = e.clientY - parentRect.top - chatDragOffsetY;
+    chatWindow.style.left = newLeft + "px";
+    chatWindow.style.top = newRight + "px";
+    }
+});
+document.addEventListener("mouseup", function() {
+    isDraggingChat = false;
+});
+
+var isChatMin = false;
+document.getElementById("minChat").addEventListener("click", function() {
+    var chatBody = document.getElementById("chatBody");
+    isChatMin = !isChatMin;
+    chatBody.style.display = isChatMin ? "none" : "flex";
 });

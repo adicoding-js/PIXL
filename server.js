@@ -6,6 +6,7 @@ const { threadName } = require("worker_threads");
 const fs = require("fs");
 const path = require("path");
 const { json } = require("body-parser");
+const { type } = require("os");
 
 var app = express();
 var server = http.createServer(app);
@@ -80,6 +81,17 @@ io.on("connection", function(socket) {
         console.log("disconnected: " + socket.id);
         io.emit("userCount", io.engine.clientsCount);
     });
+
+    socket.on("chatMessage", function(msg) {
+        if(typeof msg != "string" || msg.trim().length === 0) return;
+        var text = msg.substring(0,150);
+
+    io.to(socket.currentMap).emit("chatMessage", {
+        username: socket.username,
+        text: text,
+        time: Date.now()
+     });
+});
 });
 
 server.listen(3000, function() {

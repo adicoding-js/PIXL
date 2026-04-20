@@ -70,6 +70,23 @@
         <button class="outset" id="okUsername" style="width: 80px; margin: 10px auto 0; padding: 4px; cursor: pointer;">OK</button>
     </div>
 </div>
+    <div id="chatWindow" class="outset" style="position: absolute; bottom: 20px; left: 20px; width: 300px; background: #C0C0C0; z-index: 1000; display: flex; flex-direction: column; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);">
+            <div id="chatTitlebar" class="modal-titlebar" style="background: linear-gradient(90deg, #000080, #1084D0); color: white; display: flex; align-items: center; height: 22px; padding: 2px 4px; font-weight: bold; cursor: default;">
+                <span class="winTitle" style="font-size: 12px;">Chat - <span id="chatRoomName">Main</span></span>
+                <div class="win-buttons" style="margin-left: auto;">
+                    <button id="minChat" style="width: 16px; height: 14px; font-size: 10px; background: #C0C0C0; border: 1px solid white; border-right-color: #808080; border-bottom-color: #808080;">_</button>
+                </div>
+            </div>
+            <div id="chatBody" style="padding: 4px; display: flex; flex-direction: column; gap: 4px;">
+                <div id="chatMessages" class="inset" style="background: white; height: 150px; overflow-y: auto; font-size: 11px; padding: 4px; font-family: 'MS Sans Serif', Arial, sans-serif; word-wrap: break-word;">
+                    <div style="color: #888; font-style: italic;">Welcome to the canvas!</div>
+                </div>
+                <div style="display: flex; gap: 4px;">
+                    <input type="text" id="chatInput" class="inset" style="flex-grow: 1; font-family: 'MS Sans Serif', Arial, sans-serif; font-size: 11px; padding: 2px; outline: none;" placeholder="Type a message...">
+                    <button id="chatSend" class="outset" style="cursor: pointer; font-size: 11px; padding: 0 8px;">Send</button>
+                </div>
+            </div>
+        </div>
             <div id="toolbar">
                 <select id="mapSelect" class="inset" style="margin-left: 4px; margin-right: auto; padding: 2px;">
                     <option value="main">Main Canvas</option>
