@@ -58,3 +58,4 @@ node server.js
 ## Made with 💖 by [adicoding-js](https://github.com/adicoding-js/)
 ### Forever a Hack-Clubber 💖
 ### Made for [HCTG](https://game.hackclub.com/) with sooooooooooooooooooooo much love and hard-work😭💖
+### THANKS!💖
