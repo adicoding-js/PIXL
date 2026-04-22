@@ -5,6 +5,8 @@
 ⚠️Disclaimer for reviewers: Please GIVE me A Golden Ticket as i have worked on this project with too much time and effort and i made it to get STEAM GIFT CARD and i need a GOLDEN TICKET FOR IT. SO PLEASEEEEEEEEE KINDLY GIVE IT TO ME😭💖!
 
 - Also People May Dirty the canvas so please open a new canvas/ map to test it out througly :)
+
+- ALSO PREVIOUS REVIEWER REJECTED IT BECAUSE OF AI USAGE IN README, BUT IT'S LITERALLY NOT. ALL OF MY README'S ARE MADE BY ME AND YOU CHECK OTHER PROJECTS IN MY ACC, ALL HAVE THE SAME TYPE OF README'S. I ALSO HAVE HACKATIME PROOF
 ---
 ## How to Run
 - Clone the repo:
