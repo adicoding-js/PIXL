@@ -7,6 +7,7 @@
 - Also People May Dirty the canvas so please open a new canvas/ map to test it out througly :)
 
 - ALSO PREVIOUS REVIEWER REJECTED IT BECAUSE OF AI USAGE IN README, BUT IT'S LITERALLY NOT. ALL OF MY README'S ARE MADE BY ME AND YOU CHECK OTHER PROJECTS IN MY ACC, ALL HAVE THE SAME TYPE OF README'S. I ALSO HAVE HACKATIME PROOF
+- Come on man, atleast give me an golden ticket now man?
 ---
 ## How to Run
 - Clone the repo:
